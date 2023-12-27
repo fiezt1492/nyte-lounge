@@ -1,4 +1,5 @@
 import ChatBox from '@/components/app/Chat'
+import AudioControl from '@/components/app/Player/AudioControl'
 import {
     ResizableHandle,
     ResizablePanel,
@@ -18,6 +19,7 @@ export default function Home() {
                 <ResizablePanelGroup direction="vertical">
                     <ResizablePanel defaultSize={50}>
                         <div className="flex h-full items-center justify-center p-6">
+                            <AudioControl/>
                             <span className="font-semibold">Player</span>
                         </div>
                     </ResizablePanel>
