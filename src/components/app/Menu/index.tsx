@@ -1,18 +1,27 @@
-import React from 'react'
-import Status from './Status'
-import { useRecoilState } from 'recoil'
-import { peerStates } from '@/lib/atoms/PeerAtom'
 import { Separator } from '@/components/ui/separator'
+import { peerStates } from '@/lib/atoms/PeerAtom'
+import { useRecoilState } from 'recoil'
 import RoomControl from './RoomControl'
+import Status from './Status'
 
 function Menu() {
-    const [state, setState] = useRecoilState(peerStates)
+    const [peerStatesValue, setPeerStates] = useRecoilState(peerStates)
+    const {
+        connected,
+        roomConnected,
+        username,
+        isHost,
+        hostId,
+        mode,
+        connections,
+    } = peerStatesValue
+
     return (
         <div className="flex flex-col h-full p-6 space-y-4">
             <Status />
             <Separator />
-            {state.connected && <RoomControl />}
-            <span>Participants {state.connections.length}</span>
+            <RoomControl />
+            {roomConnected && <span>Participants {connections.length}</span>}
         </div>
     )
 }

@@ -1,17 +1,28 @@
 import ChatBox from '@/components/app/Chat'
-import ConnectPanel from '@/components/app/Menu'
 import AudioControl from '@/components/app/Player/AudioControl'
 import {
     ResizableHandle,
     ResizablePanel,
     ResizablePanelGroup,
 } from '@/components/ui/resizable'
+import dynamic from 'next/dynamic'
+import { lazy, useEffect, useState } from 'react'
+
+const ConnectPanel = dynamic(() => import('@/components/app/Menu'), {
+    ssr: false,
+})
 
 export default function Home() {
+    const [isClient, setIsClient] = useState(false)
+
+    useEffect(() => {
+        setIsClient(true)
+    }, [])
+
     return (
         <ResizablePanelGroup direction="horizontal" className={`min-h-screen`}>
             <ResizablePanel defaultSize={20}>
-                <ConnectPanel />
+                {isClient && <ConnectPanel />}
             </ResizablePanel>
             <ResizableHandle />
             <ResizablePanel defaultSize={80}>
@@ -24,7 +35,7 @@ export default function Home() {
                     </ResizablePanel>
                     <ResizableHandle />
                     <ResizablePanel defaultSize={50}>
-                        <ChatBox />
+                        {isClient && <ChatBox />}
                     </ResizablePanel>
                 </ResizablePanelGroup>
             </ResizablePanel>
