@@ -1,13 +1,13 @@
-import { ReactNode, useEffect } from 'react'
-import peerService from '@/lib/services/peer.service'
-import { generateUsername } from 'unique-username-generator'
-import { DataConnection } from 'peerjs'
-import { useRecoilState, useRecoilValue } from 'recoil'
-import { peerStates } from '@/lib/atoms/PeerAtom'
-import { toast } from 'sonner'
-import { PlayerStates, playerStates } from '@/lib/atoms/PlayerAtom'
-import { appStatesValue } from '@/lib/atoms/AppValueSelector'
 import { playerEl } from '@/components/providers/PlayerProvider'
+import { appStatesValue } from '@/lib/atoms/AppValueSelector'
+import { peerStates } from '@/lib/atoms/PeerAtom'
+import { PlayerStates, playerStates } from '@/lib/atoms/PlayerAtom'
+import peerService from '@/lib/services/peer.service'
+import { useEffect } from 'react'
+import { useRecoilState } from 'recoil'
+import { getRecoil, setRecoil } from 'recoil-nexus'
+import { toast } from 'sonner'
+import { generateUsername } from 'unique-username-generator'
 
 interface PeerProviderProps {}
 
@@ -16,7 +16,6 @@ export default function PeerProvider({}: PeerProviderProps) {
     const { connections, isHost, roomConnected, mode } = peerStatesValue
     const [playerStatesValue, setPlayerStates] = useRecoilState(playerStates)
     const { track, currentTime, paused } = playerStatesValue
-    const appStates = useRecoilValue(appStatesValue)
 
     useEffect(() => {
         const username = generateUsername('-')
@@ -30,9 +29,10 @@ export default function PeerProvider({}: PeerProviderProps) {
         })
 
         peerService.onData.addListener((data, conn) => {
+            const appStates = getRecoil(appStatesValue)
             if (data.action === 'hostCheck' && appStates.peer.joining) {
                 if (data.data.isHost === true) {
-                    setPeerStates((state) => ({
+                    setRecoil(peerStates, (state) => ({
                         ...state,
                         roomConnected: true,
                         hostId: conn.peer,
@@ -49,7 +49,7 @@ export default function PeerProvider({}: PeerProviderProps) {
                 }
             }
             if (data.action === 'syncPlayer') {
-                setPlayerStates((state) => ({
+                setRecoil(playerStates, (state) => ({
                     ...state,
                     track: data.data.url || appStates.player.track,
                     paused: data.data.paused || appStates.player.paused,
@@ -77,13 +77,14 @@ export default function PeerProvider({}: PeerProviderProps) {
                 }
             }
             if (data.action === 'newMessage') {
-                setPeerStates((state) => ({
+                setRecoil(peerStates, (state) => ({
                     ...state,
                     messages: [...appStates.peer.messages, data.data],
                 }))
             }
         })
         peerService.onConnection.addListener((conn) => {
+            const appStates = getRecoil(appStatesValue)
             peerService.send(conn, {
                 action: 'hostCheck',
                 data: {
@@ -91,12 +92,10 @@ export default function PeerProvider({}: PeerProviderProps) {
                     mode: appStates.peer.mode,
                 },
             })
-
-            setPeerStates((state) => ({
+            setRecoil(peerStates, (state) => ({
                 ...state,
                 connections: [conn, ...appStates.peer.connections],
             }))
-
             if (!appStates.peer.isHost) {
                 // request peers update
                 peerService.send(conn, {
@@ -108,7 +107,8 @@ export default function PeerProvider({}: PeerProviderProps) {
         })
 
         peerService.onClose.addListener((conn) => {
-            setPeerStates((state) => ({
+            const appStates = getRecoil(appStatesValue)
+            setRecoil(peerStates, (state) => ({
                 ...state,
                 connections: appStates.peer.connections.filter(
                     (x) => x.connectionId !== conn.connectionId

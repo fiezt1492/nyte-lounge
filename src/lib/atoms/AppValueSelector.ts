@@ -1,8 +1,13 @@
 import { selector } from 'recoil'
-import { peerStates } from './PeerAtom'
-import { playerStates } from './PlayerAtom'
+import { PeerStates, peerStates } from './PeerAtom'
+import { PlayerStates, playerStates } from './PlayerAtom'
 
-export const appStatesValue = selector({
+export type AppStates = {
+    peer: PeerStates
+    player: PlayerStates
+}
+
+export const appStatesValue = selector<AppStates>({
     key: 'AppStatesValue',
     get: ({ get }) => {
         const peer = get(peerStates)

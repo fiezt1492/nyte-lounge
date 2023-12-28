@@ -1,10 +1,14 @@
-import React, { lazy, ReactNode, useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
+import { lazy, ReactNode, useEffect, useState } from 'react'
 
 interface PlayerLayoutProps {
     children: ReactNode
 }
 
-const PeerProvider = lazy(() => import('@/components/providers/PeerProvider'))
+const PeerProvider = dynamic(
+    () => import('@/components/providers/PeerProvider'),
+    { ssr: false }
+)
 
 export default function PlayerLayout({ children }: PlayerLayoutProps) {
     const [isClient, setIsClient] = useState(false)
@@ -13,10 +17,8 @@ export default function PlayerLayout({ children }: PlayerLayoutProps) {
     }, [])
     return (
         <>
-            <div>
-                <div>{children}</div>
-                {isClient && <PeerProvider />}
-            </div>
+            <div>{children}</div>
+            {isClient && <PeerProvider />}
         </>
     )
 }
