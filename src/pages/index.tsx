@@ -1,4 +1,3 @@
-import ChatBox from '@/components/app/Chat'
 import AudioControl from '@/components/app/Player/AudioControl'
 import {
     ResizableHandle,
@@ -9,6 +8,9 @@ import dynamic from 'next/dynamic'
 import { lazy, useEffect, useState } from 'react'
 
 const ConnectPanel = dynamic(() => import('@/components/app/Menu'), {
+    ssr: false,
+})
+const ChatBox = dynamic(() => import('@/components/app/Chat'), {
     ssr: false,
 })
 

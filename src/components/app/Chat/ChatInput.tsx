@@ -1,33 +1,43 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { peerStates } from '@/lib/atoms/PeerAtom'
+import peerService from '@/lib/services/peer.service'
 import React, { useState } from 'react'
-import { useSetRecoilState } from 'recoil'
+import { useRecoilState, useSetRecoilState } from 'recoil'
+import { toast } from 'sonner'
 
 function ChatInput() {
-    const setState = useSetRecoilState(peerStates)
+    const [states, setStates] = useRecoilState(peerStates)
+    const { messages, peerId } = states
     const [message, setMessage] = useState<string>('')
+
+    const sendMessage = (e: any) => {
+        e.preventDefault()
+        if (!message || message.trim() === '') {
+            return toast.error('Please enter message')
+        } else {
+            const newMessage: ChatMessage = {
+                author: peerId!,
+                message,
+                timestamp: new Date().getTime(),
+                type: 'text',
+            }
+            peerService.sendAll({
+                action: 'newMessage',
+                data: newMessage,
+            })
+            setStates((state) => ({
+                ...state,
+                messages: [...messages, newMessage],
+            }))
+            setMessage('')
+        }
+    }
 
     return (
         <form
             className="flex w-full items-center space-x-2"
-            onSubmit={(e) => {
-                e.preventDefault()
-                if (message)
-                    setState((state) => ({
-                        ...state,
-                        messages: [
-                            ...state.messages,
-                            {
-                                author: 'Shit',
-                                timestamp: Date.now(),
-                                type: 'text',
-                                message,
-                            },
-                        ],
-                    }))
-                setMessage('')
-            }}
+            onSubmit={sendMessage}
         >
             <Input
                 name="message"

@@ -37,7 +37,6 @@ const formSchema = z.object({
 function RoomControl() {
     const [createMode, setCreateMode] = useState<ConnectMode>('broadcast')
     const [connecting, setConnecting] = useState(false)
-    const [roomMode, setRoomMode] = useState<ConnectMode>('broadcast')
     const [peerStatesValue, setPeerStates] = useRecoilState(peerStates)
     const {
         connected,
@@ -59,6 +58,7 @@ function RoomControl() {
 
     // 2. Define a submit handler.
     function onSubmit(values: z.infer<typeof formSchema>) {
+        console.log(values)
         setConnecting(true)
         peerService
             .connect(values.username)

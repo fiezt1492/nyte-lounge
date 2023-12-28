@@ -1,4 +1,5 @@
-import Peer, { DataConnection, MediaConnection } from 'peerjs'
+import Peer from 'peerjs'
+import type { DataConnection, MediaConnection } from 'peerjs'
 import { generateUsername } from 'unique-username-generator'
 
 type OnConnectionListener = (conn: DataConnection, isIncoming: boolean) => any
