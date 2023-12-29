@@ -1,4 +1,4 @@
-import { DataConnection } from 'peerjs'
+import Peer, { DataConnection } from 'peerjs'
 import { atom } from 'recoil'
 
 export type PeerStates = {
@@ -12,6 +12,7 @@ export type PeerStates = {
     joining: boolean
     mode?: ConnectMode
     messages: ChatMessage[]
+    peerClient?: Peer
 }
 
 const initialStates: PeerStates = {

@@ -4,12 +4,12 @@ import { Toaster } from '@/components/ui/sonner'
 import '@/styles/globals.css'
 import type { AppProps } from 'next/app'
 import { RecoilRoot } from 'recoil'
-import RecoilNexus from 'recoil-nexus'
+import { RecoilTunnel } from 'recoil-toolkit'
 
 export default function App({ Component, pageProps }: AppProps) {
     return (
         <RecoilRoot>
-            <RecoilNexus />
+            <RecoilTunnel />
             <AppLayout>
                 <PlayerLayout>
                     <Component {...pageProps} />

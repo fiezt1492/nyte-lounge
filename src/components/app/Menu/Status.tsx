@@ -26,7 +26,7 @@ function Status() {
                 </Badge>
             </div>
             <div className="flex flex-row space-x-2">
-                <Input disabled value={username} id="username" />
+                <Input disabled defaultValue={username} id="username" />
                 <Button onClick={copy}>Copy</Button>
             </div>
         </div>

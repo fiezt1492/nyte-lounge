@@ -1,4 +1,5 @@
-import AudioControl from '@/components/app/Player/AudioControl'
+import Player from '@/components/app/Player'
+import Searcher from '@/components/app/Searcher'
 import {
     ResizableHandle,
     ResizablePanel,
@@ -27,19 +28,20 @@ export default function Home() {
                 {isClient && <ConnectPanel />}
             </ResizablePanel>
             <ResizableHandle />
-            <ResizablePanel defaultSize={80}>
+            <ResizablePanel defaultSize={50}>
                 <ResizablePanelGroup direction="vertical">
                     <ResizablePanel defaultSize={50}>
-                        <div className="flex h-full items-center justify-center p-6">
-                            <AudioControl />
-                            <span className="font-semibold">Player</span>
-                        </div>
+                        <Player />
                     </ResizablePanel>
                     <ResizableHandle />
                     <ResizablePanel defaultSize={50}>
                         {isClient && <ChatBox />}
                     </ResizablePanel>
                 </ResizablePanelGroup>
+            </ResizablePanel>
+            <ResizableHandle />
+            <ResizablePanel defaultSize={30}>
+                <Searcher />
             </ResizablePanel>
         </ResizablePanelGroup>
     )
