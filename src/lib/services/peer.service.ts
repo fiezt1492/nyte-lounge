@@ -28,10 +28,12 @@ class PeerService {
     } = {
         listeners: [],
         addListener: (fn) => {
-            this.onData.listeners.push(fn)
+            this.onData.listeners = [...this.onData.listeners, fn]
         },
         removeListener: (fn) => {
-            this.onData.listeners.filter((x) => x !== fn)
+            this.onData.listeners = [
+                ...this.onData.listeners.filter((x) => x !== fn),
+            ]
         },
     }
 
@@ -41,7 +43,7 @@ class PeerService {
     } = {
         listeners: [],
         addListener: (fn) => {
-            this.onClose.listeners.push(fn)
+            this.onClose.listeners = [...this.onClose.listeners, fn]
         },
     }
 
@@ -51,7 +53,7 @@ class PeerService {
     } = {
         listeners: [],
         addListener: (fn) => {
-            this.onCall.listeners.push(fn)
+            this.onCall.listeners = [...this.onCall.listeners, fn]
         },
     }
 
