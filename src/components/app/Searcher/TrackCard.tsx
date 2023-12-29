@@ -9,12 +9,12 @@ interface TrackCardProps {
 function TrackCard({ item, onClick }: TrackCardProps) {
     return (
         <div
-            className="flex rounded-md border p-4 space-x-2 cursor-pointer hover:bg-accent"
+            className="flex rounded-md border p-4 space-x-2 cursor-pointer bg-card shadow-md hover:bg-gradient-to-r hover:from-accent"
             onClick={onClick}
             key={item.id}
         >
             <div
-                className="w-24 h-24 rounded-sm bg-cover bg-center"
+                className="w-24 h-24 rounded-sm bg-cover bg-center shadow-md"
                 style={{
                     backgroundImage: `url(${getTrackThumbnail(item)})`,
                 }}
