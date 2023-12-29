@@ -1,5 +1,4 @@
 import Player from '@/components/app/Player'
-import AudioControl from '@/components/app/Player/AudioControl'
 import Searcher from '@/components/app/Searcher'
 import {
     ResizableHandle,
