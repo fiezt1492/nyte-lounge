@@ -1,23 +1,19 @@
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Search } from 'lucide-react'
 import {
     Command,
-    CommandEmpty,
     CommandGroup,
     CommandInput,
     CommandItem,
 } from '@/components/ui/command'
-import React, { useEffect, useState } from 'react'
-import apiService from '@/lib/services/api.service'
-import { toast } from 'sonner'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import Image from 'next/image'
-import { AspectRatio } from '@/components/ui/aspect-ratio'
-import { formatTime, getTrackThumbnail } from '@/lib/utils'
-import { appStatesValue } from '@/lib/atoms/AppValueSelector'
+import { peerStates } from '@/lib/atoms/PeerAtom'
 import { playerStates } from '@/lib/atoms/PlayerAtom'
-import { getRecoilStore } from 'recoil-toolkit'
+import apiService from '@/lib/services/api.service'
+import { formatTime, getTrackThumbnail } from '@/lib/utils'
+import { Search } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { useRecoilState, useRecoilValue } from 'recoil'
+import { toast } from 'sonner'
 
 type BasicOptionType = { label: string; value: string }
 
@@ -26,25 +22,32 @@ function Searcher() {
     const [options, setOptions] = useState<BasicOptionType[]>([])
     const [isShowResults, setIsShowResults] = useState(false)
     const [results, setResults] = useState<YouTubeTrack[]>([])
+    const [playerStatesValue, setPlayerStates] = useRecoilState(playerStates)
+    const peerStatesValue = useRecoilValue(peerStates)
 
-    const playTrack = async (data: YouTubeTrack) => {
-        const recoilStore = await getRecoilStore()
-        const {
-            peer,
-            player: { track },
-        } = await recoilStore.getPromise(appStatesValue)
-        if (peer.roomConnected && !peer.isHost && peer.mode === 'broadcast') {
-            toast.error(
-                `You're in a broadcast room so you cannot modify the queue`
-            )
-            return
-        }
-        if (track && track.id === data.id) {
-            toast.error('This track is playing...')
-            return
-        }
-        recoilStore.set(playerStates, (state) => ({ ...state, track: data }))
-    }
+    const playTrack = useCallback(
+        (data: YouTubeTrack) => {
+            if (
+                peerStatesValue.roomConnected &&
+                !peerStatesValue.isHost &&
+                peerStatesValue.mode === 'broadcast'
+            ) {
+                toast.error(
+                    `You're in a broadcast room so you cannot play a track`
+                )
+                return
+            }
+            if (
+                playerStatesValue.track &&
+                playerStatesValue.track.id === data.id
+            ) {
+                toast.error('This track is playing...')
+                return
+            }
+            setPlayerStates((state) => ({ ...state, track: data }))
+        },
+        [peerStatesValue, playerStatesValue]
+    )
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
@@ -78,6 +81,25 @@ function Searcher() {
                 })
         })()
     }, [isShowResults, inputValue])
+
+    if (
+        peerStatesValue.roomConnected &&
+        !peerStatesValue.isHost &&
+        peerStatesValue.mode === 'broadcast'
+    )
+        return (
+            <div className="flex flex-col h-full p-6 max-h-screen w-full">
+                <div className="font-semibold">
+                    {`You cannot control the queue (seek or navigate), however you still can pause the music.`}
+                </div>
+                <div
+                    className="aspect-square bg-cover bg-center w-full"
+                    style={{
+                        backgroundImage: `url(https://www.icegif.com/wp-content/uploads/2023/09/icegif-504.gif)`,
+                    }}
+                ></div>
+            </div>
+        )
 
     return (
         <div className="flex h-full p-6 max-h-screen">
