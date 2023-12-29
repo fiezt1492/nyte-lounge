@@ -95,7 +95,7 @@ function Searcher() {
                 <div
                     className="aspect-square bg-cover bg-center w-full"
                     style={{
-                        backgroundImage: `url(https://www.icegif.com/wp-content/uploads/2023/09/icegif-504.gif)`,
+                        backgroundImage: `url('https://www.icegif.com/wp-content/uploads/2023/09/icegif-504.gif')`,
                     }}
                 ></div>
             </div>
