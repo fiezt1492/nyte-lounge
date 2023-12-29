@@ -12,6 +12,12 @@ import React, { useEffect, useState } from 'react'
 import apiService from '@/lib/services/api.service'
 import { toast } from 'sonner'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import Image from 'next/image'
+import { AspectRatio } from '@/components/ui/aspect-ratio'
+import { formatTime, getTrackThumbnail } from '@/lib/utils'
+import { appStatesValue } from '@/lib/atoms/AppValueSelector'
+import { playerStates } from '@/lib/atoms/PlayerAtom'
+import { getRecoilStore } from 'recoil-toolkit'
 
 type BasicOptionType = { label: string; value: string }
 
@@ -20,6 +26,25 @@ function Searcher() {
     const [options, setOptions] = useState<BasicOptionType[]>([])
     const [isShowResults, setIsShowResults] = useState(false)
     const [results, setResults] = useState<YouTubeTrack[]>([])
+
+    const playTrack = async (data: YouTubeTrack) => {
+        const recoilStore = await getRecoilStore()
+        const {
+            peer,
+            player: { track },
+        } = await recoilStore.getPromise(appStatesValue)
+        if (peer.roomConnected && !peer.isHost && peer.mode === 'broadcast') {
+            toast.error(
+                `You're in a broadcast room so you cannot modify the queue`
+            )
+            return
+        }
+        if (track && track.id === data.id) {
+            toast.error('This track is playing...')
+            return
+        }
+        recoilStore.set(playerStates, (state) => ({ ...state, track: data }))
+    }
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
@@ -37,7 +62,7 @@ function Searcher() {
                         )
                     }
                 })
-        }, 3000)
+        }, 1500)
 
         return () => clearTimeout(delayDebounceFn)
     }, [inputValue])
@@ -55,18 +80,20 @@ function Searcher() {
     }, [isShowResults, inputValue])
 
     return (
-        <div className="flex h-full p-6">
+        <div className="flex h-full p-6 max-h-screen">
             {!isShowResults && (
                 <div className="w-full">
                     <Command>
-                        <div className="flex w-full space-x-2">
-                            <CommandInput
-                                placeholder="type a song name..."
-                                value={inputValue}
-                                onValueChange={(search) =>
-                                    setInputValue(search)
-                                }
-                            />
+                        <div className="flex w-full space-x-2 items-center">
+                            <div className="flex-1">
+                                <CommandInput
+                                    placeholder="type a song name..."
+                                    value={inputValue}
+                                    onValueChange={(search) =>
+                                        setInputValue(search)
+                                    }
+                                />
+                            </div>
                             <Button
                                 size="icon"
                                 onClick={() => {
@@ -103,12 +130,33 @@ function Searcher() {
                     </Button>
                     <ScrollArea className="flex-1 w-full mt-4">
                         <ul className="space-y-2">
-                            {results.map((v) => (
+                            {results.map((item) => (
                                 <li
-                                    className="rounded-md border p-4"
-                                    key={v.id}
+                                    className="flex rounded-md border p-4 space-x-2 cursor-pointer hover:bg-accent"
+                                    onClick={() => playTrack(item)}
+                                    key={item.id}
                                 >
-                                    {v.title?.text}
+                                    <div
+                                        className="w-24 h-24 rounded-sm bg-cover bg-center"
+                                        style={{
+                                            backgroundImage: `url(${getTrackThumbnail(
+                                                item
+                                            )})`,
+                                        }}
+                                    />
+                                    <div className="flex-1 flex flex-col min-w-0">
+                                        <div className="text-md font-semibold">
+                                            {item.title?.text}
+                                        </div>
+                                        <div className="text-sm text-muted-foreground">
+                                            {formatTime(
+                                                item.duration.seconds || 0
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <Button>Play</Button>
+                                    </div>
                                 </li>
                             ))}
                         </ul>

@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 const defaultThumbnail =
     'https://mixkit.imgix.net/static/home/home-item-type-showcase-music-pop.jpg'
 
-export const getTrackThumbnail = (track: YouTubeTrack) => {
+export const getTrackThumbnail = (track?: YouTubeTrack | null) => {
     if (!track) return defaultThumbnail
     return (track.thumbnails || track.thumbnail)[0].url
 }

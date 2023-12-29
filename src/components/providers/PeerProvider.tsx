@@ -5,7 +5,7 @@ import { PlayerStates, playerStates } from '@/lib/atoms/PlayerAtom'
 import peerService from '@/lib/services/peer.service'
 import { useEffect } from 'react'
 import { useRecoilState } from 'recoil'
-import { getRecoil, setRecoil } from 'recoil-nexus'
+import { getRecoilStore } from 'recoil-toolkit'
 import { toast } from 'sonner'
 import { generateUsername } from 'unique-username-generator'
 
@@ -28,11 +28,12 @@ export default function PeerProvider({}: PeerProviderProps) {
             }))
         })
 
-        peerService.onData.addListener((data, conn) => {
-            const appStates = getRecoil(appStatesValue)
+        peerService.onData.addListener(async (data, conn) => {
+            const store = await getRecoilStore()
+            const appStates = await store.getPromise(appStatesValue)
             if (data.action === 'hostCheck' && appStates.peer.joining) {
                 if (data.data.isHost === true) {
-                    setRecoil(peerStates, (state) => ({
+                    store.set(peerStates, (state) => ({
                         ...state,
                         roomConnected: true,
                         hostId: conn.peer,
@@ -49,7 +50,7 @@ export default function PeerProvider({}: PeerProviderProps) {
                 }
             }
             if (data.action === 'syncPlayer') {
-                setRecoil(playerStates, (state) => ({
+                store.set(playerStates, (state) => ({
                     ...state,
                     track: data.data.url || appStates.player.track,
                     paused: data.data.paused || appStates.player.paused,
@@ -72,19 +73,20 @@ export default function PeerProvider({}: PeerProviderProps) {
                         !appStates.peer.connections.find((x) => x.peer === peer)
                     ) {
                         // connect to peer since he is not in our list
-                        peerService.connect(peer).then(() => null)
+                        peerService.connect(peer)
                     }
                 }
             }
             if (data.action === 'newMessage') {
-                setRecoil(peerStates, (state) => ({
+                store.set(peerStates, (state) => ({
                     ...state,
                     messages: [...appStates.peer.messages, data.data],
                 }))
             }
         })
-        peerService.onConnection.addListener((conn) => {
-            const appStates = getRecoil(appStatesValue)
+        peerService.onConnection.addListener(async (conn) => {
+            const store = await getRecoilStore()
+            const appStates = await store.getPromise(appStatesValue)
             peerService.send(conn, {
                 action: 'hostCheck',
                 data: {
@@ -92,7 +94,7 @@ export default function PeerProvider({}: PeerProviderProps) {
                     mode: appStates.peer.mode,
                 },
             })
-            setRecoil(peerStates, (state) => ({
+            store.set(peerStates, (state) => ({
                 ...state,
                 connections: [conn, ...appStates.peer.connections],
             }))
@@ -106,9 +108,10 @@ export default function PeerProvider({}: PeerProviderProps) {
             }
         })
 
-        peerService.onClose.addListener((conn) => {
-            const appStates = getRecoil(appStatesValue)
-            setRecoil(peerStates, (state) => ({
+        peerService.onClose.addListener(async (conn) => {
+            const store = await getRecoilStore()
+            const appStates = await store.getPromise(appStatesValue)
+            store.set(peerStates, (state) => ({
                 ...state,
                 connections: appStates.peer.connections.filter(
                     (x) => x.connectionId !== conn.connectionId
