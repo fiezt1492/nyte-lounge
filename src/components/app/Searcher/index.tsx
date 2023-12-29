@@ -14,6 +14,7 @@ import { Search } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { toast } from 'sonner'
+import TrackCard from './TrackCard'
 
 type BasicOptionType = { label: string; value: string }
 
@@ -153,32 +154,11 @@ function Searcher() {
                     <ScrollArea className="flex-1 w-full mt-4">
                         <ul className="space-y-2">
                             {results.map((item) => (
-                                <li
-                                    className="flex rounded-md border p-4 space-x-2 cursor-pointer hover:bg-accent"
-                                    onClick={() => playTrack(item)}
-                                    key={item.id}
-                                >
-                                    <div
-                                        className="w-24 h-24 rounded-sm bg-cover bg-center"
-                                        style={{
-                                            backgroundImage: `url(${getTrackThumbnail(
-                                                item
-                                            )})`,
-                                        }}
+                                <li key={item.id}>
+                                    <TrackCard
+                                        item={item}
+                                        onClick={() => playTrack(item)}
                                     />
-                                    <div className="flex-1 flex flex-col min-w-0">
-                                        <div className="text-md font-semibold">
-                                            {item.title?.text}
-                                        </div>
-                                        <div className="text-sm text-muted-foreground">
-                                            {formatTime(
-                                                item.duration.seconds || 0
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <Button>Play</Button>
-                                    </div>
                                 </li>
                             ))}
                         </ul>

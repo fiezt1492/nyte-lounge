@@ -35,7 +35,7 @@ function Player() {
                 <TooltipProvider>
                     <div className="flex w-full mb-6 flex-1 min-h-0 min-w-0">
                         <div
-                            className="bg-muted h-full bg-cover bg-center shadow-md aspect-square"
+                            className="rounded-sm bg-muted h-full bg-cover bg-center shadow-md aspect-square"
                             style={{
                                 backgroundImage: `url('${getTrackThumbnail(
                                     track
