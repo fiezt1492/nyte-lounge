@@ -131,9 +131,6 @@ function Player() {
                             </Tooltip>
                             <Button
                                 size={'icon'}
-                                className={
-                                    'bg-black text-lg font-bold text-white'
-                                }
                                 onClick={() => {
                                     if (!playerEl || loading) return
                                     if (playerEl.paused) {
