@@ -30,28 +30,32 @@ function Player() {
         if (!seeking) setSeekTime(currentTime || 0)
     }, [currentTime])
     return (
-        <div className="flex h-full p-6">
-            <div className="w-full h-full flex flex-col justify-between">
+        <div className="flex h-full p-6 justify-center items-center bg-muted">
+            <div className="w-full h-full flex flex-col justify-between max-w-2xl border rounded-sm px-8 shadow-lg bg-card">
                 <TooltipProvider>
-                    <div className="flex w-full mb-6 flex-1 min-h-0 min-w-0">
-                        <div
-                            className="bg-muted h-full bg-cover bg-center shadow-md aspect-square"
-                            style={{
-                                backgroundImage: `url('${getTrackThumbnail(
-                                    track
-                                )}')`,
-                            }}
-                        />
-                        <div className="flex-1 w-full ml-6">
-                            <div className="font-bold">
-                                {track?.title.text || (
-                                    <Skeleton className="h-8 w-[250px]" />
-                                )}
+                    <div className="=w-full mb-6 flex-1 min-h-0 min-w-0">
+                        <div className="flex flex-col space-y-8 items-center justify-center">
+                            <div className="flex w-full items-center justify-center p-16 min-w-0">
+                                <div
+                                    className="rounded-sm bg-muted w-full bg-cover bg-center shadow-md aspect-square max-w-md z-50 backdrop-blur-sm drop-shadow-2xl"
+                                    style={{
+                                        backgroundImage: `url('${getTrackThumbnail(
+                                            track
+                                        )}')`,
+                                    }}
+                                />
                             </div>
-                            <div className="">
-                                {track?.author.name || (
-                                    <Skeleton className="h-6 w-[200px] mt-2" />
-                                )}
+                            <div className="w-full min-w-0">
+                                <div className="font-bold h-8 drop-shadow-lg truncate">
+                                    {track?.title.text || (
+                                        <Skeleton className="h-8 w-[250px]" />
+                                    )}
+                                </div>
+                                <div className="h-8 drop-shadow-md truncate">
+                                    {track?.author.name || (
+                                        <Skeleton className="h-6 w-[200px] mt-2" />
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -131,9 +135,6 @@ function Player() {
                             </Tooltip>
                             <Button
                                 size={'icon'}
-                                className={
-                                    'bg-black text-lg font-bold text-white'
-                                }
                                 onClick={() => {
                                     if (!playerEl || loading) return
                                     if (playerEl.paused) {

@@ -25,22 +25,22 @@ export default function Home() {
     return (
         <ResizablePanelGroup direction="horizontal" className={`min-h-screen`}>
             <ResizablePanel defaultSize={20}>
-                {isClient && <ConnectPanel />}
-            </ResizablePanel>
-            <ResizableHandle />
-            <ResizablePanel defaultSize={50}>
                 <ResizablePanelGroup direction="vertical">
-                    <ResizablePanel defaultSize={50}>
-                        <Player />
+                    <ResizablePanel defaultSize={40}>
+                        {isClient && <ConnectPanel />}
                     </ResizablePanel>
                     <ResizableHandle />
-                    <ResizablePanel defaultSize={50}>
+                    <ResizablePanel defaultSize={60}>
                         {isClient && <ChatBox />}
                     </ResizablePanel>
                 </ResizablePanelGroup>
             </ResizablePanel>
             <ResizableHandle />
-            <ResizablePanel defaultSize={30}>
+            <ResizablePanel defaultSize={40}>
+                <Player />
+            </ResizablePanel>
+            <ResizableHandle />
+            <ResizablePanel defaultSize={40}>
                 <Searcher />
             </ResizablePanel>
         </ResizablePanelGroup>
