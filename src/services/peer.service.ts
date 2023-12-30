@@ -7,7 +7,7 @@ type OnDataListener = (data: any, conn: DataConnection) => any
 type OnCloseListener = (conn: DataConnection) => any
 type OnCallListener = (conn: MediaConnection) => any
 
-class PeerService {
+export class PeerService {
     client?: Peer
     id: string = ''
     connections: DataConnection[] = []
@@ -57,7 +57,7 @@ class PeerService {
         },
     }
 
-    initialize(id?: string): Promise<string> {
+    initialize(id: string): Promise<string> {
         return new Promise((resolve) => {
             if (!id) id = generateUsername('-')
             this.id = id
@@ -114,7 +114,9 @@ class PeerService {
     }
 
     connect(peerId: string) {
-        if (!this.client) throw new Error('Peer is not initialized')
+        if (!this.client) {
+            throw new Error('Peer is not initialized')
+        }
         const conn = this.client.connect(peerId)
         return new Promise((resolve, reject) => {
             conn.on('open', () => {
@@ -122,20 +124,27 @@ class PeerService {
                 this.onConnection.listeners.forEach((fn) => fn(conn, false))
                 resolve(conn)
             })
+
             conn.on('data', (data) => {
                 data = JSON.parse(decodeURIComponent(data as string))
                 this.onData.listeners.forEach((fn) => fn(data, conn))
             })
+
             conn.on('error', () => {
                 this.onClose.listeners.forEach((fn) => fn(conn))
                 this.removeConnection(conn)
                 reject(conn)
             })
+
             conn.on('close', () => {
                 this.onClose.listeners.forEach((fn) => fn(conn))
                 this.removeConnection(conn)
             })
-            if (!this.client) throw new Error('Peer is not initialized')
+
+            if (!this.client) {
+                throw new Error('Peer is not initialized')
+            }
+
             this.client.on('error', () => {
                 reject()
             })
@@ -172,4 +181,6 @@ class PeerService {
     }
 }
 
-export default new PeerService()
+const peerService = new PeerService()
+
+export default peerService

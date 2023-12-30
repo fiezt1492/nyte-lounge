@@ -9,22 +9,24 @@ import {
     Tooltip,
     TooltipContent,
 } from '@/components/ui/tooltip'
-import { peerStates } from '@/lib/atoms/PeerAtom'
-import { playerStates } from '@/lib/atoms/PlayerAtom'
 import { formatTime, getTrackThumbnail } from '@/lib/utils'
 import { FastForward, Pause, Play, Rewind } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useRecoilState } from 'recoil'
 import VolumeControl from './VolumeControl'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
+import { setPlayer } from '@/redux/slices/player.slice'
 
 function Player() {
     // const ref = useRef<ReactPlayer>(null)
-    const [peerStatesValue, setPeerStates] = useRecoilState(peerStates)
-    const [playerStatesValue, setPlayerStates] = useRecoilState(playerStates)
+    const dispatch = useAppDispatch()
+    const { connected, roomConnected, isHost, mode } = useAppSelector(
+        (state) => state.connect
+    )
+    const { track, currentTime, paused, loading } = useAppSelector(
+        (state) => state.player
+    )
     const [seekTime, setSeekTime] = useState(0)
     const [seeking, setSeeking] = useState(false)
-    const { track, currentTime, paused, loading } = playerStatesValue
-    const { connected, roomConnected, isHost, mode } = peerStatesValue
 
     useEffect(() => {
         if (!seeking) setSeekTime(currentTime || 0)
@@ -78,15 +80,14 @@ function Player() {
                                 }
                                 onValueCommit={async ([value]) => {
                                     setSeeking(false)
-                                    setPlayerStates((state) => ({
-                                        ...state,
-                                        currentTime: value,
-                                        shouldUpdateBySeek: true,
-                                    }))
+                                    dispatch(
+                                        setPlayer({
+                                            currentTime: value,
+                                            shouldUpdateBySeek: true,
+                                        })
+                                    )
                                     const peerService = (
-                                        await import(
-                                            '@/lib/services/peer.service'
-                                        )
+                                        await import('@/services/peer.service')
                                     ).default
                                     if (
                                         roomConnected &&
@@ -117,12 +118,13 @@ function Player() {
                                     <Button
                                         size={'icon'}
                                         onClick={() => {
-                                            setPlayerStates((state) => ({
-                                                ...state,
-                                                currentTime:
-                                                    state.currentTime - 10,
-                                                shouldUpdateBySeek: true,
-                                            }))
+                                            dispatch(
+                                                setPlayer({
+                                                    currentTime:
+                                                        currentTime - 10,
+                                                    shouldUpdateBySeek: true,
+                                                })
+                                            )
                                         }}
                                         disabled={currentTime <= 10}
                                     >
@@ -150,12 +152,13 @@ function Player() {
                                     <Button
                                         size={'icon'}
                                         onClick={() => {
-                                            setPlayerStates((state) => ({
-                                                ...state,
-                                                currentTime:
-                                                    state.currentTime + 10,
-                                                shouldUpdateBySeek: true,
-                                            }))
+                                            dispatch(
+                                                setPlayer({
+                                                    currentTime:
+                                                        currentTime + 10,
+                                                    shouldUpdateBySeek: true,
+                                                })
+                                            )
                                         }}
                                         disabled={
                                             currentTime >=

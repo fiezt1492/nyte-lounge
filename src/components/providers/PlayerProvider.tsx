@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useRef, useState } from 'react'
-import apiService from '@/lib/services/api.service'
-import { useRecoilState } from 'recoil'
-import { playerStates } from '@/lib/atoms/PlayerAtom'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
+import apiService from '@/services/api.service'
+import { setPlayer } from '@/redux/slices/player.slice'
 import { toast } from 'sonner'
 
 interface PlayerProviderProps {
@@ -11,11 +11,10 @@ interface PlayerProviderProps {
 export let playerEl: HTMLAudioElement | null = null
 
 export default function PlayerProvider({ children }: PlayerProviderProps) {
+    const dispatch = useAppDispatch()
     const [playingTrack, setPlayingTrack] = useState<YouTubeTrack | null>(null)
-    const [playerStatesValue, setPlayerStates] = useRecoilState(playerStates)
-
     const { track, currentTime, shouldUpdateBySeek, volumeLevel, paused } =
-        playerStatesValue
+        useAppSelector((state) => state.player)
     const audioRef = useRef<HTMLAudioElement>(null)
 
     useEffect(() => {
@@ -23,32 +22,33 @@ export default function PlayerProvider({ children }: PlayerProviderProps) {
             const el = audioRef.current
             playerEl = el
             el.onpause = () => {
-                setPlayerStates((state) => ({ ...state, paused: el.paused }))
+                dispatch(
+                    setPlayer({
+                        paused: el.paused,
+                    })
+                )
             }
             el.ontimeupdate = () => {
-                setPlayerStates((state) => ({
-                    ...state,
-                    currentTime: el.currentTime,
-                }))
+                dispatch(
+                    setPlayer({
+                        currentTime: el.currentTime,
+                    })
+                )
             }
             el.onended = () => {
-                setPlayerStates((state) => ({
-                    ...state,
-                    url: '',
-                    paused: true,
-                    currentTime: 0,
-                }))
+                dispatch(
+                    setPlayer({
+                        track: null,
+                        paused: true,
+                        currentTime: 0,
+                    })
+                )
             }
-            el.onpause = () =>
-                setPlayerStates((state) => ({ ...state, paused: el.paused }))
-            el.onplay = () =>
-                setPlayerStates((state) => ({ ...state, paused: el.paused }))
-            el.onplaying = () =>
-                setPlayerStates((state) => ({ ...state, paused: el.paused }))
-            el.onloadstart = () =>
-                setPlayerStates((state) => ({ ...state, loading: true }))
-            el.oncanplay = () =>
-                setPlayerStates((state) => ({ ...state, loading: false }))
+            el.onpause = () => dispatch(setPlayer({ paused: el.paused }))
+            el.onplay = () => dispatch(setPlayer({ paused: el.paused }))
+            el.onplaying = () => dispatch(setPlayer({ paused: el.paused }))
+            el.onloadstart = () => dispatch(setPlayer({ loading: true }))
+            el.oncanplay = () => dispatch(setPlayer({ loading: false }))
             el.onerror = (event: any) => {
                 if (event.target.error && event.target.error.code === 4) {
                     return toast.error(
@@ -87,10 +87,11 @@ export default function PlayerProvider({ children }: PlayerProviderProps) {
         const el = audioRef.current
         if (shouldUpdateBySeek && el && el.currentTime !== currentTime) {
             el.currentTime = currentTime
-            setPlayerStates((state) => ({
-                ...state,
-                shouldUpdateBySeek: false,
-            }))
+            dispatch(
+                setPlayer({
+                    shouldUpdateBySeek: false,
+                })
+            )
         }
     }, [shouldUpdateBySeek])
 

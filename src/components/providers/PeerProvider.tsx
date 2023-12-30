@@ -1,47 +1,51 @@
-import { playerEl } from '@/components/providers/PlayerProvider'
-import { appStatesValue } from '@/lib/atoms/AppValueSelector'
-import { peerStates } from '@/lib/atoms/PeerAtom'
-import { PlayerStates, playerStates } from '@/lib/atoms/PlayerAtom'
-import peerService from '@/lib/services/peer.service'
-import { useEffect } from 'react'
-import { useRecoilState } from 'recoil'
-import { getRecoilStore } from 'recoil-toolkit'
-import { toast } from 'sonner'
+import { ReactNode, useEffect } from 'react'
+import peerService from '@/services/peer.service'
 import { generateUsername } from 'unique-username-generator'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
+import { setConnectSlice } from '@/redux/slices/connect.slice'
+import { RootState, store } from '@/redux/store'
+import { DataConnection } from 'peerjs'
+import { PlayerSliceState, setPlayer } from '@/redux/slices/player.slice'
+import { playerEl } from '@/components/providers/PlayerProvider'
+import { usePrevious } from '@/redux/hooks/usePrevious'
+import { toast } from 'sonner'
 
 interface PeerProviderProps {}
 
 export default function PeerProvider({}: PeerProviderProps) {
-    const [peerStatesValue, setPeerStates] = useRecoilState(peerStates)
-    const { connections, isHost, roomConnected, mode } = peerStatesValue
-    const [playerStatesValue, setPlayerStates] = useRecoilState(playerStates)
-    const { track, currentTime, paused } = playerStatesValue
+    const dispatch = useAppDispatch()
+    const { connections, isHost, roomConnected, mode } = useAppSelector(
+        (state) => state.connect
+    )
+    const { track, currentTime, paused } = useAppSelector(
+        (state) => state.player
+    )
 
     useEffect(() => {
         const username = generateUsername('-')
         peerService.initialize(username).then((id) => {
-            setPeerStates((state) => ({
-                ...state,
-                connected: true,
-                username,
-                peerId: id,
-            }))
+            dispatch(
+                setConnectSlice({
+                    connected: true,
+                    username,
+                    peerId: id,
+                })
+            )
         })
-
-        peerService.onData.addListener(async (data, conn) => {
-            const store = await getRecoilStore()
-            const appStates = await store.getPromise(appStatesValue)
-            if (data.action === 'hostCheck' && appStates.peer.joining) {
+        peerService.onData.addListener((data, conn) => {
+            const state = store.getState() as RootState
+            if (data.action === 'hostCheck' && state.connect.joining) {
                 if (data.data.isHost === true) {
-                    store.set(peerStates, (state) => ({
-                        ...state,
-                        roomConnected: true,
-                        hostId: conn.peer,
-                        mode: data.data.mode,
-                    }))
+                    dispatch(
+                        setConnectSlice({
+                            roomConnected: true,
+                            hostId: conn.peer,
+                            mode: data.data.mode,
+                        })
+                    )
                     return toast.success('Connected!')
-                } else if (!appStates.peer.isHost) {
-                    if (!appStates.peer.roomConnected) {
+                } else if (!state.connect.isHost) {
+                    if (!state.connect.roomConnected) {
                         // when user is trying to connect to a non-host client when not in the room
                         // then disconnect that connection since it's useless
                         conn.close()
@@ -50,11 +54,12 @@ export default function PeerProvider({}: PeerProviderProps) {
                 }
             }
             if (data.action === 'syncPlayer') {
-                store.set(playerStates, (state) => ({
-                    ...state,
-                    track: data.data.url || appStates.player.track,
-                    paused: data.data.paused || appStates.player.paused,
-                }))
+                dispatch(
+                    setPlayer({
+                        track: data.data.track || state.player.track,
+                        paused: data.data.paused || state.player.paused,
+                    })
+                )
             }
             if (data.action === 'seek' && playerEl) {
                 playerEl.currentTime = data.data
@@ -62,7 +67,7 @@ export default function PeerProvider({}: PeerProviderProps) {
             if (data.action === 'requestPeers') {
                 peerService.send(conn, {
                     action: 'peersUpdate',
-                    data: appStates.peer.connections.map((conn) => conn.peer),
+                    data: state.connect.connections.map((conn) => conn.peer),
                 })
             }
             if (data.action === 'peersUpdate') {
@@ -70,35 +75,36 @@ export default function PeerProvider({}: PeerProviderProps) {
                 const peersList = data.data
                 for (let peer of peersList) {
                     if (
-                        !appStates.peer.connections.find((x) => x.peer === peer)
+                        !state.connect.connections.find((x) => x.peer === peer)
                     ) {
                         // connect to peer since he is not in our list
-                        peerService.connect(peer)
+                        peerService.connect(peer).then(() => null)
                     }
                 }
             }
             if (data.action === 'newMessage') {
-                store.set(peerStates, (state) => ({
-                    ...state,
-                    messages: [...appStates.peer.messages, data.data],
-                }))
+                dispatch(
+                    setConnectSlice({
+                        messages: [...state.connect.messages, data.data],
+                    })
+                )
             }
         })
-        peerService.onConnection.addListener(async (conn) => {
-            const store = await getRecoilStore()
-            const appStates = await store.getPromise(appStatesValue)
+        peerService.onConnection.addListener((conn) => {
+            const state = store.getState() as RootState
             peerService.send(conn, {
                 action: 'hostCheck',
                 data: {
-                    isHost: appStates.peer.isHost,
-                    mode: appStates.peer.mode,
+                    isHost: state.connect.isHost,
+                    mode: state.connect.mode,
                 },
             })
-            store.set(peerStates, (state) => ({
-                ...state,
-                connections: [conn, ...appStates.peer.connections],
-            }))
-            if (!appStates.peer.isHost) {
+            dispatch(
+                setConnectSlice({
+                    connections: [conn, ...state.connect.connections],
+                })
+            )
+            if (!state.connect.isHost) {
                 // request peers update
                 peerService.send(conn, {
                     action: 'requestPeers',
@@ -108,23 +114,24 @@ export default function PeerProvider({}: PeerProviderProps) {
             }
         })
 
-        peerService.onClose.addListener(async (conn) => {
-            const store = await getRecoilStore()
-            const appStates = await store.getPromise(appStatesValue)
-            store.set(peerStates, (state) => ({
-                ...state,
-                connections: appStates.peer.connections.filter(
-                    (x) => x.connectionId !== conn.connectionId
-                ),
-            }))
+        peerService.onClose.addListener((conn) => {
+            const state = store.getState() as RootState
+            dispatch(
+                setConnectSlice({
+                    connections: state.connect.connections.filter(
+                        (x) => x.connectionId !== conn.connectionId
+                    ),
+                })
+            )
         })
 
         return () => {
-            setPeerStates((state) => ({
-                ...state,
-                roomConnected: false,
-                connections: [],
-            }))
+            dispatch(
+                setConnectSlice({
+                    roomConnected: false,
+                    connections: [],
+                })
+            )
             peerService.disconnect()
         }
     }, [])
@@ -134,10 +141,10 @@ export default function PeerProvider({}: PeerProviderProps) {
             roomConnected &&
             ((mode === 'broadcast' && isHost) || mode === 'group')
         ) {
-            const syncData: Optional<PlayerStates> = {
+            const syncData: Optional<PlayerSliceState> = {
                 track: track,
+                paused: paused,
             }
-
             peerService.sendAll({
                 action: 'syncPlayer',
                 data: syncData,

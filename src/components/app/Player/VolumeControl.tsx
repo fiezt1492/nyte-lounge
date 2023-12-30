@@ -15,14 +15,14 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { useRecoilState } from 'recoil'
-import { playerStates } from '@/lib/atoms/PlayerAtom'
 import { Volume, Volume1, Volume2, VolumeX } from 'lucide-react'
 import { Slider } from '@/components/ui/slider'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
+import { setPlayer } from '@/redux/slices/player.slice'
 
 function VolumeControl() {
-    const [playerStatesValue, setPlayerStates] = useRecoilState(playerStates)
-    const { volumeLevel } = playerStatesValue
+    const dispatch = useAppDispatch()
+    const { volumeLevel } = useAppSelector((state) => state.player)
 
     const VolumeIcon =
         volumeLevel > 75
@@ -61,10 +61,11 @@ function VolumeControl() {
                         min={0}
                         max={100}
                         onValueChange={([value]) => {
-                            setPlayerStates((state) => ({
-                                ...state,
-                                volumeLevel: value,
-                            }))
+                            dispatch(
+                                setPlayer({
+                                    volumeLevel: value,
+                                })
+                            )
                         }}
                     />
                 </div>

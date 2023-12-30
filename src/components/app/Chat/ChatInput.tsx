@@ -1,14 +1,14 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { peerStates } from '@/lib/atoms/PeerAtom'
-import peerService from '@/lib/services/peer.service'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
+import { setConnectSlice } from '@/redux/slices/connect.slice'
+import peerService from '@/services/peer.service'
 import React, { useState } from 'react'
-import { useRecoilState, useSetRecoilState } from 'recoil'
 import { toast } from 'sonner'
 
 function ChatInput() {
-    const [states, setStates] = useRecoilState(peerStates)
-    const { messages, peerId } = states
+    const dispatch = useAppDispatch()
+    const { messages, peerId } = useAppSelector((state) => state.connect)
     const [message, setMessage] = useState<string>('')
 
     const sendMessage = (e: any) => {
@@ -26,10 +26,11 @@ function ChatInput() {
                 action: 'newMessage',
                 data: newMessage,
             })
-            setStates((state) => ({
-                ...state,
-                messages: [...messages, newMessage],
-            }))
+            dispatch(
+                setConnectSlice({
+                    messages: [...messages, newMessage],
+                })
+            )
             setMessage('')
         }
     }

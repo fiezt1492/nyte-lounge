@@ -6,49 +6,24 @@ import {
     CommandItem,
 } from '@/components/ui/command'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { peerStates } from '@/lib/atoms/PeerAtom'
-import { playerStates } from '@/lib/atoms/PlayerAtom'
-import apiService from '@/lib/services/api.service'
-import { formatTime, getTrackThumbnail } from '@/lib/utils'
+import { enqueueTrack } from '@/redux/actions/player.actions'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
+import apiService from '@/services/api.service'
 import { Search } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import TrackCard from './TrackCard'
 
 type BasicOptionType = { label: string; value: string }
 
 function Searcher() {
+    const dispatch = useAppDispatch()
+    const peerStatesValue = useAppSelector((state) => state.connect)
+    const playerStatesValue = useAppSelector((state) => state.player)
     const [inputValue, setInputValue] = useState('')
     const [options, setOptions] = useState<BasicOptionType[]>([])
     const [isShowResults, setIsShowResults] = useState(false)
     const [results, setResults] = useState<YouTubeTrack[]>([])
-    const [playerStatesValue, setPlayerStates] = useRecoilState(playerStates)
-    const peerStatesValue = useRecoilValue(peerStates)
-
-    const playTrack = useCallback(
-        (data: YouTubeTrack) => {
-            if (
-                peerStatesValue.roomConnected &&
-                !peerStatesValue.isHost &&
-                peerStatesValue.mode === 'broadcast'
-            ) {
-                toast.error(
-                    `You're in a broadcast room so you cannot play a track`
-                )
-                return
-            }
-            if (
-                playerStatesValue.track &&
-                playerStatesValue.track.id === data.id
-            ) {
-                toast.error('This track is playing...')
-                return
-            }
-            setPlayerStates((state) => ({ ...state, track: data }))
-        },
-        [peerStatesValue, playerStatesValue]
-    )
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
@@ -66,7 +41,7 @@ function Searcher() {
                         )
                     }
                 })
-        }, 1500)
+        }, 500)
 
         return () => clearTimeout(delayDebounceFn)
     }, [inputValue])
@@ -82,6 +57,11 @@ function Searcher() {
                 })
         })()
     }, [isShowResults, inputValue])
+
+    const clickSearch = () => {
+        if (!inputValue) toast.error("You didn't type anything")
+        else setIsShowResults(true)
+    }
 
     if (
         peerStatesValue.roomConnected &&
@@ -120,9 +100,7 @@ function Searcher() {
                             <Button
                                 size="icon"
                                 onClick={() => {
-                                    if (!inputValue)
-                                        toast.error("You didn't type anything")
-                                    else setIsShowResults(true)
+                                    clickSearch()
                                 }}
                             >
                                 <Search className="h-4 w-4" />
@@ -134,7 +112,10 @@ function Searcher() {
                                 <CommandItem
                                     key={v.value}
                                     value={v.label}
-                                    onSelect={() => setInputValue(v.value)}
+                                    onSelect={() => {
+                                        setInputValue(v.value)
+                                        clickSearch()
+                                    }}
                                 >
                                     {v.label}
                                 </CommandItem>
@@ -155,10 +136,7 @@ function Searcher() {
                         <ul className="space-y-2">
                             {results.map((item) => (
                                 <li key={item.id}>
-                                    <TrackCard
-                                        item={item}
-                                        onClick={() => playTrack(item)}
-                                    />
+                                    <TrackCard item={item} />
                                 </li>
                             ))}
                         </ul>
