@@ -7,7 +7,6 @@ import { RootState, store } from '@/redux/store'
 import { DataConnection } from 'peerjs'
 import { PlayerSliceState, setPlayer } from '@/redux/slices/player.slice'
 import { playerEl } from '@/components/providers/PlayerProvider'
-import { usePrevious } from '@/redux/hooks/usePrevious'
 import { toast } from 'sonner'
 
 interface PeerProviderProps {}
