@@ -53,12 +53,19 @@ export default function PeerProvider({}: PeerProviderProps) {
                 }
             }
             if (data.action === 'syncPlayer') {
-                dispatch(
-                    setPlayer({
-                        track: data.data.track || state.player.track,
-                        paused: data.data.paused || state.player.paused,
-                    })
-                )
+                if (data.data.track.id !== state.player.track?.id)
+                    dispatch(
+                        setPlayer({
+                            track: data.data.track || state.player.track,
+                            paused: data.data.paused || state.player.paused,
+                        })
+                    )
+                if (data.data.paused !== state.player.paused)
+                    dispatch(
+                        setPlayer({
+                            paused: data.data.paused || state.player.paused,
+                        })
+                    )
             }
             if (data.action === 'seek' && playerEl) {
                 playerEl.currentTime = data.data
