@@ -30,6 +30,7 @@ function Messages() {
                     <div
                         key={`${v.author}_${v.timestamp}`}
                         title={`${new Date(v.timestamp)}`}
+                        className='min-w-0'
                     >
                         {v.author}: {v.message}
                     </div>

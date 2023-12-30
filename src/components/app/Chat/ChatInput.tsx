@@ -1,12 +1,13 @@
+import { usePeerService } from '@/components/providers/PeerProvider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { peerStates } from '@/lib/atoms/PeerAtom'
-import peerService from '@/lib/services/peer.service'
 import React, { useState } from 'react'
 import { useRecoilState, useSetRecoilState } from 'recoil'
 import { toast } from 'sonner'
 
 function ChatInput() {
+    const peerService = usePeerService()
     const [states, setStates] = useRecoilState(peerStates)
     const { messages, peerId } = states
     const [message, setMessage] = useState<string>('')
@@ -22,7 +23,7 @@ function ChatInput() {
                 timestamp: new Date().getTime(),
                 type: 'text',
             }
-            peerService.sendAll({
+            peerService?.sendAll({
                 action: 'newMessage',
                 data: newMessage,
             })

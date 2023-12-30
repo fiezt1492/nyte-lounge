@@ -10,7 +10,6 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { peerStates } from '@/lib/atoms/PeerAtom'
-import peerService from '@/lib/services/peer.service'
 import { ChevronDown, Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { useRecoilState } from 'recoil'
@@ -27,6 +26,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { usePeerService } from '@/components/providers/PeerProvider'
 
 const formSchema = z.object({
     username: z.string().min(2, {
@@ -35,6 +35,7 @@ const formSchema = z.object({
 })
 
 function RoomControl() {
+    const peerService = usePeerService()
     const [createMode, setCreateMode] = useState<ConnectMode>('broadcast')
     const [connecting, setConnecting] = useState(false)
     const [peerStatesValue, setPeerStates] = useRecoilState(peerStates)
@@ -61,7 +62,7 @@ function RoomControl() {
         console.log(values)
         setConnecting(true)
         peerService
-            .connect(values.username)
+            ?.connect(values.username)
             .then((r: any) => {
                 setPeerStates((state) => ({
                     ...state,

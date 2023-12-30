@@ -19,7 +19,7 @@ function ChatBox() {
     } = peerStatesValue
 
     return (
-        <div className="flex flex-col h-full justify-center p-4">
+        <div className="flex flex-col h-full justify-center">
             {roomConnected ? (
                 <>
                     <Messages />

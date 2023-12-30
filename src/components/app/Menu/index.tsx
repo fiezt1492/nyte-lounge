@@ -3,6 +3,7 @@ import { peerStates } from '@/lib/atoms/PeerAtom'
 import { useRecoilState } from 'recoil'
 import RoomControl from './RoomControl'
 import Status from './Status'
+import ChatBox from '../Chat'
 
 function Menu() {
     const [peerStatesValue, setPeerStates] = useRecoilState(peerStates)
@@ -22,6 +23,8 @@ function Menu() {
             <Separator />
             <RoomControl />
             {roomConnected && <span>Participants {connections.length}</span>}
+            <Separator />
+            <ChatBox />
         </div>
     )
 }

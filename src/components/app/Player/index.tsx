@@ -16,9 +16,11 @@ import { FastForward, Pause, Play, Rewind } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import VolumeControl from './VolumeControl'
+import { usePeerService } from '@/components/providers/PeerProvider'
 
 function Player() {
     // const ref = useRef<ReactPlayer>(null)
+    const peerService = usePeerService()
     const [peerStatesValue, setPeerStates] = useRecoilState(peerStates)
     const [playerStatesValue, setPlayerStates] = useRecoilState(playerStates)
     const [seekTime, setSeekTime] = useState(0)
@@ -83,11 +85,6 @@ function Player() {
                                         currentTime: value,
                                         shouldUpdateBySeek: true,
                                     }))
-                                    const peerService = (
-                                        await import(
-                                            '@/lib/services/peer.service'
-                                        )
-                                    ).default
                                     if (
                                         roomConnected &&
                                         ((mode === 'broadcast' && isHost) ||

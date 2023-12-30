@@ -5,15 +5,10 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from '@/components/ui/resizable'
-import dynamic from 'next/dynamic'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { lazy, useEffect, useState } from 'react'
 
-const ConnectPanel = dynamic(() => import('@/components/app/Menu'), {
-    ssr: false,
-})
-const ChatBox = dynamic(() => import('@/components/app/Chat'), {
-    ssr: false,
-})
+const ConnectPanel = lazy(() => import('@/components/app/Menu'))
 
 export default function Home() {
     const [isClient, setIsClient] = useState(false)
@@ -23,17 +18,9 @@ export default function Home() {
     }, [])
 
     return (
-        <ResizablePanelGroup direction="horizontal" className={`min-h-screen`}>
+        <ResizablePanelGroup direction="horizontal" className={`min-h-dvh`}>
             <ResizablePanel defaultSize={20}>
-                <ResizablePanelGroup direction="vertical">
-                    <ResizablePanel defaultSize={40}>
-                        {isClient && <ConnectPanel />}
-                    </ResizablePanel>
-                    <ResizableHandle />
-                    <ResizablePanel defaultSize={60}>
-                        {isClient && <ChatBox />}
-                    </ResizablePanel>
-                </ResizablePanelGroup>
+                {isClient && <ConnectPanel />}
             </ResizablePanel>
             <ResizableHandle />
             <ResizablePanel defaultSize={40}>

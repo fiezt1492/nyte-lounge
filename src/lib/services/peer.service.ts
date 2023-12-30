@@ -7,7 +7,7 @@ type OnDataListener = (data: any, conn: DataConnection) => any
 type OnCloseListener = (conn: DataConnection) => any
 type OnCallListener = (conn: MediaConnection) => any
 
-class PeerService {
+export class PeerService {
     client?: Peer
     id: string = ''
     connections: DataConnection[] = []
@@ -57,11 +57,17 @@ class PeerService {
         },
     }
 
-    initialize(id?: string): Promise<string> {
+    initialize({
+        id,
+        client,
+    }: {
+        id?: string
+        client?: Peer
+    }): Promise<string> {
         return new Promise((resolve) => {
             if (!id) id = generateUsername('-')
+            this.client = client || new Peer(id)
             this.id = id
-            this.client = new Peer(id)
 
             this.client.on('connection', (conn) => {
                 // other client connected
@@ -172,4 +178,6 @@ class PeerService {
     }
 }
 
-export default new PeerService()
+const peerService = new PeerService()
+
+export default peerService
