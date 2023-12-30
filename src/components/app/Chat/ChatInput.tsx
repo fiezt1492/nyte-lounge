@@ -1,7 +1,7 @@
 import { usePeerService } from '@/components/providers/PeerProvider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { peerStates } from '@/lib/atoms/PeerAtom'
+import { peerStates } from '@/recoil/atoms/PeerAtom'
 import React, { useState } from 'react'
 import { useRecoilState, useSetRecoilState } from 'recoil'
 import { toast } from 'sonner'

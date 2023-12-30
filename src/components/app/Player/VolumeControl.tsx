@@ -16,7 +16,7 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { useRecoilState } from 'recoil'
-import { playerStates } from '@/lib/atoms/PlayerAtom'
+import { playerStates } from '@/recoil/atoms/PlayerAtom'
 import { Volume, Volume1, Volume2, VolumeX } from 'lucide-react'
 import { Slider } from '@/components/ui/slider'
 

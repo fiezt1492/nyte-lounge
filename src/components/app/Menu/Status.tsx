@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { peerStates } from '@/lib/atoms/PeerAtom'
+import { peerStates } from '@/recoil/atoms/PeerAtom'
 import { Zap, ZapOff } from 'lucide-react'
 import { useRecoilValue } from 'recoil'
 import { toast } from 'sonner'

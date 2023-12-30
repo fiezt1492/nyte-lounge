@@ -6,9 +6,9 @@ import {
     CommandItem,
 } from '@/components/ui/command'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { peerStates } from '@/lib/atoms/PeerAtom'
-import { playerStates } from '@/lib/atoms/PlayerAtom'
-import apiService from '@/lib/services/api.service'
+import { peerStates } from '@/recoil/atoms/PeerAtom'
+import { playerStates } from '@/recoil/atoms/PlayerAtom'
+import apiService from '@/services/api.service'
 import { formatTime, getTrackThumbnail } from '@/lib/utils'
 import { Search } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'

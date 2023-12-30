@@ -1,5 +1,5 @@
 import { Separator } from '@/components/ui/separator'
-import { peerStates } from '@/lib/atoms/PeerAtom'
+import { peerStates } from '@/recoil/atoms/PeerAtom'
 import { useRecoilState } from 'recoil'
 import RoomControl from './RoomControl'
 import Status from './Status'

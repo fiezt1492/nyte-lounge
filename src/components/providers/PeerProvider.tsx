@@ -1,8 +1,8 @@
 import { playerEl } from '@/components/providers/PlayerProvider'
-import { appStatesValue } from '@/lib/atoms/AppValueSelector'
-import { peerStates } from '@/lib/atoms/PeerAtom'
-import { PlayerStates, playerStates } from '@/lib/atoms/PlayerAtom'
-import { PeerService } from '@/lib/services/peer.service'
+import { appStatesValue } from '@/recoil/atoms/AppValueSelector'
+import { peerStates } from '@/recoil/atoms/PeerAtom'
+import { PlayerStates, playerStates } from '@/recoil/atoms/PlayerAtom'
+import { PeerService } from '@/services/peer.service'
 // import peerService from '@/lib/services/peer.service'
 import {
     ReactNode,
@@ -32,7 +32,7 @@ export default function PeerProvider({ children }: PeerProviderProps) {
     const { track, currentTime, paused } = playerStatesValue
 
     useEffect(() => {
-        import('@/lib/services/peer.service').then(
+        import('@/services/peer.service').then(
             ({ default: peerService }) => {
                 setPeerService(peerService)
             }

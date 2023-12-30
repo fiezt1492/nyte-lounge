@@ -1,5 +1,5 @@
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { peerStates } from '@/lib/atoms/PeerAtom'
+import { peerStates } from '@/recoil/atoms/PeerAtom'
 import React, { useEffect, useRef } from 'react'
 import { useRecoilState, useRecoilValue } from 'recoil'
 

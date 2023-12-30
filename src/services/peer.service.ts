@@ -120,7 +120,9 @@ export class PeerService {
     }
 
     connect(peerId: string) {
-        if (!this.client) throw new Error('Peer is not initialized')
+        if (!this.client) {
+            throw new Error('Peer is not initialized')
+        }
         const conn = this.client.connect(peerId)
         return new Promise((resolve, reject) => {
             conn.on('open', () => {
@@ -128,20 +130,27 @@ export class PeerService {
                 this.onConnection.listeners.forEach((fn) => fn(conn, false))
                 resolve(conn)
             })
+
             conn.on('data', (data) => {
                 data = JSON.parse(decodeURIComponent(data as string))
                 this.onData.listeners.forEach((fn) => fn(data, conn))
             })
+
             conn.on('error', () => {
                 this.onClose.listeners.forEach((fn) => fn(conn))
                 this.removeConnection(conn)
                 reject(conn)
             })
+
             conn.on('close', () => {
                 this.onClose.listeners.forEach((fn) => fn(conn))
                 this.removeConnection(conn)
             })
-            if (!this.client) throw new Error('Peer is not initialized')
+
+            if (!this.client) {
+                throw new Error('Peer is not initialized')
+            }
+
             this.client.on('error', () => {
                 reject()
             })

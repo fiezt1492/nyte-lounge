@@ -9,8 +9,8 @@ import {
     Tooltip,
     TooltipContent,
 } from '@/components/ui/tooltip'
-import { peerStates } from '@/lib/atoms/PeerAtom'
-import { playerStates } from '@/lib/atoms/PlayerAtom'
+import { peerStates } from '@/recoil/atoms/PeerAtom'
+import { playerStates } from '@/recoil/atoms/PlayerAtom'
 import { formatTime, getTrackThumbnail } from '@/lib/utils'
 import { FastForward, Pause, Play, Rewind } from 'lucide-react'
 import { useEffect, useState } from 'react'

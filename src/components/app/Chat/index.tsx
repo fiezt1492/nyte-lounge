@@ -3,7 +3,7 @@ import ChatInput from './ChatInput'
 import { Separator } from '@/components/ui/separator'
 import Messages from './Messages'
 import { useRecoilState } from 'recoil'
-import { peerStates } from '@/lib/atoms/PeerAtom'
+import { peerStates } from '@/recoil/atoms/PeerAtom'
 import { WifiOff } from 'lucide-react'
 
 function ChatBox() {

@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useRef, useState } from 'react'
-import apiService from '@/lib/services/api.service'
+import apiService from '@/services/api.service'
 import { useRecoilState } from 'recoil'
-import { playerStates } from '@/lib/atoms/PlayerAtom'
+import { playerStates } from '@/recoil/atoms/PlayerAtom'
 import { toast } from 'sonner'
 
 interface PlayerProviderProps {
