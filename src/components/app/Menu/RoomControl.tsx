@@ -133,11 +133,15 @@ function RoomControl() {
                                                             <Input
                                                                 required
                                                                 placeholder={`host's peer ID...`}
+                                                                disabled={
+                                                                    !connected
+                                                                }
                                                                 {...field}
                                                             />
                                                             <Button
                                                                 type="submit"
                                                                 disabled={
+                                                                    !connected ||
                                                                     connecting
                                                                 }
                                                             >
@@ -169,6 +173,7 @@ function RoomControl() {
                                                     e ? 'broadcast' : 'group'
                                                 )
                                             }
+                                            disabled={!connected}
                                             checked={createMode === 'broadcast'}
                                         />
                                         <Label htmlFor="roomMode">{`${createMode
@@ -177,7 +182,12 @@ function RoomControl() {
                                             1
                                         )}`}</Label>
                                     </div>
-                                    <Button onClick={createRoom}>Create</Button>
+                                    <Button
+                                        disabled={!connected}
+                                        onClick={createRoom}
+                                    >
+                                        Create
+                                    </Button>
                                 </div>
                                 <div>
                                     <>
