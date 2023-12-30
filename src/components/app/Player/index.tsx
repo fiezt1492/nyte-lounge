@@ -90,7 +90,7 @@ function Player() {
                                         ((mode === 'broadcast' && isHost) ||
                                             mode === 'group')
                                     ) {
-                                        peerService.sendAll({
+                                        peerService?.sendAll({
                                             action: 'seek',
                                             data: value,
                                         })
