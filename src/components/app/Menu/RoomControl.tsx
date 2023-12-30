@@ -9,10 +9,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { peerStates } from '@/recoil/atoms/PeerAtom'
 import { ChevronDown, Loader2 } from 'lucide-react'
 import { useState } from 'react'
-import { useRecoilState } from 'recoil'
 import { toast } from 'sonner'
 import {
     Form,
@@ -26,7 +24,9 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { usePeerService } from '@/components/providers/PeerProvider'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
+import peerService from '@/services/peer.service'
+import { setConnectSlice } from '@/redux/slices/connect.slice'
 
 const formSchema = z.object({
     username: z.string().min(2, {
@@ -35,10 +35,9 @@ const formSchema = z.object({
 })
 
 function RoomControl() {
-    const peerService = usePeerService()
+    const dispatch = useAppDispatch()
     const [createMode, setCreateMode] = useState<ConnectMode>('broadcast')
     const [connecting, setConnecting] = useState(false)
-    const [peerStatesValue, setPeerStates] = useRecoilState(peerStates)
     const {
         connected,
         roomConnected,
@@ -47,7 +46,7 @@ function RoomControl() {
         hostId,
         mode,
         connections,
-    } = peerStatesValue
+    } = useAppSelector((state) => state.connect)
 
     // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
@@ -62,12 +61,13 @@ function RoomControl() {
         console.log(values)
         setConnecting(true)
         peerService
-            ?.connect(values.username)
+            .connect(values.username)
             .then((r: any) => {
-                setPeerStates((state) => ({
-                    ...state,
-                    joining: true,
-                }))
+                dispatch(
+                    setConnectSlice({
+                        joining: true,
+                    })
+                )
                 setTimeout(() => {
                     setConnecting(false)
                 }, 300)
@@ -79,12 +79,13 @@ function RoomControl() {
     }
 
     const createRoom = () => {
-        setPeerStates((state) => ({
-            ...state,
-            roomConnected: true,
-            isHost: true,
-            mode: createMode,
-        }))
+        dispatch(
+            setConnectSlice({
+                roomConnected: true,
+                isHost: true,
+                mode: createMode,
+            })
+        )
     }
 
     return (

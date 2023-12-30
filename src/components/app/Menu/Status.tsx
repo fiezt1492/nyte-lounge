@@ -1,13 +1,12 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { peerStates } from '@/recoil/atoms/PeerAtom'
+import { useAppSelector } from '@/redux/hooks'
 import { Zap, ZapOff } from 'lucide-react'
-import { useRecoilValue } from 'recoil'
 import { toast } from 'sonner'
 
 function Status() {
-    const { username, connected } = useRecoilValue(peerStates)
+    const { username, connected } = useAppSelector((state) => state.connect)
     const copy = () => {
         // TODO: Copy ID
         navigator.clipboard

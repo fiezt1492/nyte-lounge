@@ -1,16 +1,26 @@
 import { formatTime, getTrackThumbnail } from '@/lib/utils'
+import { enqueueTrack } from '@/redux/actions/player.actions'
+import { useAppDispatch } from '@/redux/hooks'
 import React from 'react'
 
 interface TrackCardProps {
     item: YouTubeTrack
-    onClick: () => void
 }
 
-function TrackCard({ item, onClick }: TrackCardProps) {
+function TrackCard({ item }: TrackCardProps) {
+    const dispatch = useAppDispatch()
+
     return (
         <div
             className="flex rounded-md border p-4 space-x-2 cursor-pointer bg-card shadow-md hover:bg-gradient-to-r hover:from-accent"
-            onClick={onClick}
+            onClick={() =>
+                dispatch(
+                    enqueueTrack({
+                        track: item,
+                        playNow: true,
+                    })
+                )
+            }
             key={item.id}
         >
             <div

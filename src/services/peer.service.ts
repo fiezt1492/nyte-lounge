@@ -57,17 +57,11 @@ export class PeerService {
         },
     }
 
-    initialize({
-        id,
-        client,
-    }: {
-        id?: string
-        client?: Peer
-    }): Promise<string> {
+    initialize(id: string): Promise<string> {
         return new Promise((resolve) => {
             if (!id) id = generateUsername('-')
-            this.client = client || new Peer(id)
             this.id = id
+            this.client = new Peer(id)
 
             this.client.on('connection', (conn) => {
                 // other client connected

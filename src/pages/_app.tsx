@@ -1,21 +1,23 @@
 import AppLayout from '@/components/layouts/AppLayout'
 import PlayerLayout from '@/components/layouts/PlayerLayout'
 import { Toaster } from '@/components/ui/sonner'
+import { persistor, store } from '@/redux/store'
 import '@/styles/globals.css'
 import type { AppProps } from 'next/app'
-import { RecoilRoot } from 'recoil'
-import { RecoilTunnel } from 'recoil-toolkit'
+import { Provider } from 'react-redux'
+import { PersistGate } from 'redux-persist/integration/react'
 
 export default function App({ Component, pageProps }: AppProps) {
     return (
-        <RecoilRoot>
-            <RecoilTunnel />
-            <AppLayout>
-                <PlayerLayout>
-                    <Component {...pageProps} />
-                </PlayerLayout>
-            </AppLayout>
-            <Toaster />
-        </RecoilRoot>
+        <Provider store={store}>
+            <PersistGate loading={null} persistor={persistor}>
+                <AppLayout>
+                    <PlayerLayout>
+                        <Component {...pageProps} />
+                    </PlayerLayout>
+                </AppLayout>
+                <Toaster />
+            </PersistGate>
+        </Provider>
     )
 }

@@ -2,13 +2,13 @@ import React from 'react'
 import ChatInput from './ChatInput'
 import { Separator } from '@/components/ui/separator'
 import Messages from './Messages'
-import { useRecoilState } from 'recoil'
-import { peerStates } from '@/recoil/atoms/PeerAtom'
 import { WifiOff } from 'lucide-react'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 
 function ChatBox() {
-    const [peerStatesValue, setPeerStates] = useRecoilState(peerStates)
+    const dispatch = useAppDispatch()
     const {
+        showDrawer,
         connected,
         roomConnected,
         username,
@@ -16,7 +16,7 @@ function ChatBox() {
         hostId,
         mode,
         connections,
-    } = peerStatesValue
+    } = useAppSelector((state) => state.connect)
 
     return (
         <div className="flex flex-col h-full justify-center">

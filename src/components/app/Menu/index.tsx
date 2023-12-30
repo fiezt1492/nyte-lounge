@@ -1,12 +1,10 @@
 import { Separator } from '@/components/ui/separator'
-import { peerStates } from '@/recoil/atoms/PeerAtom'
-import { useRecoilState } from 'recoil'
 import RoomControl from './RoomControl'
 import Status from './Status'
 import ChatBox from '../Chat'
+import { useAppSelector } from '@/redux/hooks'
 
 function Menu() {
-    const [peerStatesValue, setPeerStates] = useRecoilState(peerStates)
     const {
         connected,
         roomConnected,
@@ -15,7 +13,7 @@ function Menu() {
         hostId,
         mode,
         connections,
-    } = peerStatesValue
+    } = useAppSelector((state) => state.connect)
 
     return (
         <div className="flex flex-col h-full p-6 space-y-4">

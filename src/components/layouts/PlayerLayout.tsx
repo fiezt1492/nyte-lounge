@@ -13,11 +13,8 @@ export default function PlayerLayout({ children }: PlayerLayoutProps) {
     }, [])
     return (
         <>
-            {isClient && (
-                <PeerProvider>
-                    <div>{children}</div>
-                </PeerProvider>
-            )}
+            <div>{children}</div>
+            {isClient && <PeerProvider />}
         </>
     )
 }

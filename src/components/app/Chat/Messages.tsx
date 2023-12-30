@@ -1,11 +1,12 @@
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { peerStates } from '@/recoil/atoms/PeerAtom'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
+import { setConnectSlice } from '@/redux/slices/connect.slice'
 import React, { useEffect, useRef } from 'react'
-import { useRecoilState, useRecoilValue } from 'recoil'
 
 function Messages() {
+    const dispatch = useAppDispatch()
+    const { messages, peerId } = useAppSelector((state) => state.connect)
     const ref = useRef<HTMLDivElement>(null)
-    const [state, setState] = useRecoilState(peerStates)
 
     const scrollToBottom = () => {
         if (ref.current) ref.current.scrollIntoView({ behavior: 'smooth' })
@@ -14,23 +15,24 @@ function Messages() {
     useEffect(() => {
         scrollToBottom()
 
-        if (state.messages.length > 20) {
-            let last50Messages = state.messages.slice(-50)
-            setState((state) => ({
-                ...state,
-                messages: last50Messages,
-            }))
+        if (messages.length > 20) {
+            let last50Messages = messages.slice(-50)
+            dispatch(
+                setConnectSlice({
+                    messages: last50Messages,
+                })
+            )
         }
-    }, [state.messages])
+    }, [messages])
 
     return (
         <ScrollArea className="flex-1 w-full">
             <ul>
-                {state.messages.map((v) => (
+                {messages.map((v) => (
                     <div
                         key={`${v.author}_${v.timestamp}`}
                         title={`${new Date(v.timestamp)}`}
-                        className='min-w-0'
+                        className="min-w-0"
                     >
                         {v.author}: {v.message}
                     </div>
