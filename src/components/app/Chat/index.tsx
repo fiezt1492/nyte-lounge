@@ -19,15 +19,17 @@ function ChatBox() {
     } = useAppSelector((state) => state.connect)
 
     return (
-        <div className="flex flex-col h-full justify-center">
+        <div className="h-full">
             {roomConnected ? (
-                <>
+                <div className="flex flex-col h-full justify-center">
+                    <span>Participants {connections.length}</span>
+                    <Separator className="mt-2" />
                     <Messages />
-                    <Separator className="my-4" />
+                    <Separator className="mb-4" />
                     <ChatInput />
-                </>
+                </div>
             ) : (
-                <div className="flex items-center justify-center space-x-2">
+                <div className="flex items-center justify-center space-x-2 h-full">
                     <WifiOff />
                     <span className="scroll-m-20 text-xl font-semibold tracking-tight">
                         {' '}
