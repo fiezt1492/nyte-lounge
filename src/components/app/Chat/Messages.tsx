@@ -15,7 +15,7 @@ function Messages() {
     useEffect(() => {
         scrollToBottom()
 
-        if (messages.length > 20) {
+        if (messages.length > 50) {
             let last50Messages = messages.slice(-50)
             dispatch(
                 setConnectSlice({
