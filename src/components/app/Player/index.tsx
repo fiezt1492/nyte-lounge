@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react'
 import VolumeControl from './VolumeControl'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { setPlayer } from '@/redux/slices/player.slice'
+import { toast } from 'sonner'
 
 function Player() {
     // const ref = useRef<ReactPlayer>(null)
@@ -27,6 +28,25 @@ function Player() {
     )
     const [seekTime, setSeekTime] = useState(0)
     const [seeking, setSeeking] = useState(false)
+
+    const sendSeek = async (value: number) => {
+        dispatch(
+            setPlayer({
+                currentTime: value,
+                shouldUpdateBySeek: true,
+            })
+        )
+        const peerService = (await import('@/services/peer.service')).default
+        if (
+            roomConnected &&
+            ((mode === 'broadcast' && isHost) || mode === 'group')
+        ) {
+            peerService.sendAll({
+                action: 'seek',
+                data: value,
+            })
+        }
+    }
 
     useEffect(() => {
         if (!seeking) setSeekTime(currentTime || 0)
@@ -68,37 +88,22 @@ function Player() {
                                 min={0}
                                 value={[seekTime]}
                                 onValueChange={([v]) => {
+                                    if (loading) return
                                     setSeeking(true)
                                     setSeekTime(v)
                                 }}
                                 step={1}
                                 disabled={
-                                    connected &&
-                                    roomConnected &&
-                                    mode === 'broadcast' &&
-                                    !isHost
-                                }
-                                onValueCommit={async ([value]) => {
-                                    setSeeking(false)
-                                    dispatch(
-                                        setPlayer({
-                                            currentTime: value,
-                                            shouldUpdateBySeek: true,
-                                        })
-                                    )
-                                    const peerService = (
-                                        await import('@/services/peer.service')
-                                    ).default
-                                    if (
+                                    loading ||
+                                    (connected &&
                                         roomConnected &&
-                                        ((mode === 'broadcast' && isHost) ||
-                                            mode === 'group')
-                                    ) {
-                                        peerService.sendAll({
-                                            action: 'seek',
-                                            data: value,
-                                        })
-                                    }
+                                        mode === 'broadcast' &&
+                                        !isHost)
+                                }
+                                onValueCommit={([value]) => {
+                                    if (loading) return
+                                    setSeeking(false)
+                                    sendSeek(value)
                                 }}
                             />
                         </div>
@@ -117,16 +122,10 @@ function Player() {
                                 <TooltipTrigger asChild>
                                     <Button
                                         size={'icon'}
-                                        onClick={() => {
-                                            dispatch(
-                                                setPlayer({
-                                                    currentTime:
-                                                        currentTime - 10,
-                                                    shouldUpdateBySeek: true,
-                                                })
-                                            )
-                                        }}
-                                        disabled={currentTime <= 10}
+                                        onClick={() =>
+                                            sendSeek(currentTime - 10)
+                                        }
+                                        disabled={loading || currentTime <= 10}
                                     >
                                         <Rewind />
                                     </Button>
@@ -151,18 +150,14 @@ function Player() {
                                 <TooltipTrigger asChild>
                                     <Button
                                         size={'icon'}
-                                        onClick={() => {
-                                            dispatch(
-                                                setPlayer({
-                                                    currentTime:
-                                                        currentTime + 10,
-                                                    shouldUpdateBySeek: true,
-                                                })
-                                            )
-                                        }}
+                                        onClick={() =>
+                                            sendSeek(currentTime + 10)
+                                        }
                                         disabled={
+                                            loading ||
                                             currentTime >=
-                                            (track?.duration.seconds || 0) - 10
+                                                (track?.duration.seconds || 0) -
+                                                    10
                                         }
                                     >
                                         <FastForward />

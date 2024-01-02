@@ -4,7 +4,6 @@ import {DataConnection} from "peerjs";
 export interface ConnectSliceState {
   connected: boolean;
   roomConnected: boolean;
-  showDrawer: boolean;
   username?: string;
   peerId?: string;
   connections: DataConnection[];
@@ -18,7 +17,6 @@ export interface ConnectSliceState {
 const initialState: ConnectSliceState = {
   connected: false,
   roomConnected: false,
-  showDrawer: false,
   connections: [],
   isHost: false,
   joining: false,
